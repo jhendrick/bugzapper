@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asteroids - Classic Space Shooter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">BUGZAPPER</h1>
+            <div class="score-display">
+                <span>Score: <span id="current-score">0</span></span>
+                <span>Lives: <span id="lives">3</span></span>
+                <span>Level: <span id="level">1</span></span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="scoreboard-section" id="scoreboard-section">
+                <h2>Top Scores</h2>
+                <div class="scoreboard" id="scoreboard">
+                    <div class="loading">Loading scores...</div>
+                </div>
+                <button class="start-button" id="start-button">Start Game</button>
+            </div>
+
+            <div class="game-section" id="game-section" style="display: none;">
+                <canvas id="game-canvas" width="800" height="600"></canvas>
+                <div class="game-controls">
+                    <div class="control-info">
+                        <div class="control-group">
+                            <span class="key">↑</span>
+                            <span>Thrust</span>
+                        </div>
+                        <div class="control-group">
+                            <span class="key">← →</span>
+                            <span>Rotate</span>
+                        </div>
+                        <div class="control-group">
+                            <span class="key">Space</span>
+                            <span>Shoot</span>
+                        </div>
+                        <div class="control-group">
+                            <span class="key">P</span>
+                            <span>Pause</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-over-section" id="game-over-section" style="display: none;">
+                <div class="game-over-modal">
+                    <h2>Game Over</h2>
+                    <p>Final Score: <span id="final-score">0</span></p>
+                    <div class="name-input-section">
+                        <input type="text" id="player-name" placeholder="Enter your name" maxlength="20">
+                        <button id="submit-score">Submit Score</button>
+                    </div>
+                    <button id="play-again">Play Again</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pause-overlay" id="pause-overlay" style="display: none;">
+            <div class="pause-message">
+                <h2>PAUSED</h2>
+                <p>Press P to continue</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
