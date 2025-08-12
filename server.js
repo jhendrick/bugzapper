@@ -19,6 +19,7 @@ app.get('/api/scores', (req, res) => {
   res.json(topScores);
 });
 
+// Add a new score
 app.post('/api/scores', (req, res) => {
   const { playerName, score } = req.body;
   
@@ -44,6 +45,12 @@ app.post('/api/scores', (req, res) => {
   }
   
   res.json(newScore);
+});
+
+// Clear all scores
+app.get('/api/clearScores', (req, res) => {
+  let scores = [];
+  res.json({ message: 'All scores cleared successfully' });
 });
 
 app.listen(PORT, () => {
