@@ -127,7 +127,7 @@ body {
     color: #ff6b6b;
 }
 
-.start-button, #submit-score, #play-again {
+.start-button, #submit-score, #play-again, .clear-button {
     background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
     border: none;
     color: white;
@@ -142,9 +142,19 @@ body {
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
 }
 
-.start-button:hover, #submit-score:hover, #play-again:hover {
+.start-button:hover, #submit-score:hover, #play-again:hover, .clear-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
+.clear-button {
+    background: linear-gradient(45deg, #ff4757, #ff3838);
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+}
+
+.clear-button:hover {
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.6);
 }
 
 .game-section {

@@ -79,6 +79,10 @@ class Game {
             this.startGame();
         });
         
+        document.getElementById('clear-button').addEventListener('click', () => {
+            this.clearScores();
+        });
+        
         // Enter key for name input
         document.getElementById('player-name').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -345,6 +349,27 @@ class Game {
         } catch (error) {
             console.error('Error loading scoreboard:', error);
             document.getElementById('scoreboard').innerHTML = '<div class="loading">Error loading scores</div>';
+        }
+    }
+    
+    async clearScores() {
+        if (confirm('Are you sure you want to clear all scores? This action cannot be undone.')) {
+            try {
+                const response = await fetch('/api/clearScores', {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(result.message);
+                    this.loadScoreboard(); // Reload the scoreboard to show it's empty
+                } else {
+                    alert('Failed to clear scores');
+                }
+            } catch (error) {
+                console.error('Error clearing scores:', error);
+                alert('Error clearing scores. Please try again.');
+            }
         }
     }
     

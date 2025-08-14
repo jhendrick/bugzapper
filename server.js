@@ -3,7 +3,7 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// In-memory storage for scores
+// In-memory storage for top scores
 let scores = [];
 
 // Middleware
@@ -50,6 +50,7 @@ app.post('/api/scores', (req, res) => {
 // Clear all scores
 app.get('/api/clearScores', (req, res) => {
   let scores = [];
+  console.log('All scores cleared successfully');
   res.json({ message: 'All scores cleared successfully' });
 });
 
