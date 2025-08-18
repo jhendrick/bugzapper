@@ -6,6 +6,9 @@ const PORT = 3000;
 // In-memory storage for top scores
 let scores = [];
 
+// In-memory storage for player statistics
+let playerStats = [];
+
 // Middleware
 app.use(express.json());
 app.use(express.static('public'));
@@ -52,6 +55,45 @@ app.get('/api/clearScores', (req, res) => {
   let scores = [];
   console.log('All scores cleared successfully');
   res.json({ message: 'All scores cleared successfully' });
+});
+
+// Add player statistics
+app.post('/api/playerStats', (req, res) => {
+  const { playerName, bulletsFired, asteroidsDestroyed, levelReached, timePlayed } = req.body;
+  
+  if (!playerName || typeof bulletsFired !== 'number' || typeof asteroidsDestroyed !== 'number' || 
+      typeof levelReached !== 'number' || typeof timePlayed !== 'number') {
+    return res.status(400).json({ error: 'Invalid player statistics data' });
+  }
+  
+  // Add new player statistics with timestamp
+  const newStats = {
+    id: Date.now() + Math.random(),
+    playerName: playerName.substring(0, 20), // Limit name length
+    bulletsFired: Math.max(0, Math.floor(bulletsFired)),
+    asteroidsDestroyed: Math.max(0, Math.floor(asteroidsDestroyed)),
+    levelReached: Math.max(1, Math.floor(levelReached)),
+    timePlayed: Math.max(0, Math.floor(timePlayed)), // in seconds
+    accuracy: Math.max(0, Math.floor(asteroidsDestroyed / bulletsFired * 100)),
+    timestamp: new Date().toISOString()
+  };
+  
+  playerStats.push(newStats);
+  
+  // Keep only the most recent 100 player statistics to prevent memory issues
+  if (playerStats.length > 100) {
+    playerStats = playerStats.slice(-100);
+  }
+  
+  res.json(newStats);
+});
+
+// Get player statistics (most recent first)
+app.get('/api/playerStats', (req, res) => {
+  const recentStats = playerStats
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .slice(0, 10);
+  res.json(recentStats);
 });
 
 app.listen(PORT, () => {

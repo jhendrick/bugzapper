@@ -16,6 +16,13 @@ class Game {
         this.level = 1;
         this.keys = {};
         
+        // Player statistics tracking
+        this.bulletsFired = 0;
+        this.asteroidsDestroyed = 0;
+        this.gameStartTime = 0;
+        this.timePlayed = 0;
+        this.lastGameStats = null; // Store the last game's stats for current player
+        
         // Image assets
         this.images = {};
         this.imagesLoaded = 0;
@@ -33,6 +40,7 @@ class Game {
         this.loadImages();
         this.loadScoreboard();
         this.resetGame();
+        this.updateStatsButtonState();
     }
     
     loadImages() {
@@ -83,6 +91,14 @@ class Game {
             this.clearScores();
         });
         
+        document.getElementById('player-stats-button').addEventListener('click', () => {
+            if (this.lastGameStats) {
+                this.showPlayerStats();
+            } else {
+                alert('No game statistics available yet. Play a game first!');
+            }
+        });
+        
         // Enter key for name input
         document.getElementById('player-name').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -98,6 +114,12 @@ class Game {
         this.asteroids = [];
         this.bullets = [];
         this.particles = [];
+        
+        // Reset statistics
+        this.bulletsFired = 0;
+        this.asteroidsDestroyed = 0;
+        this.gameStartTime = 0;
+        this.timePlayed = 0;
         
         // Create ship
         this.ship = new Ship(this.canvas.width / 2, this.canvas.height / 2);
@@ -115,6 +137,7 @@ class Game {
         
         this.resetGame();
         this.state = 'playing';
+        this.gameStartTime = Date.now();
         requestAnimationFrame(this.gameLoop);
     }
     
@@ -180,6 +203,7 @@ class Game {
             const bullet = this.ship.shoot();
             if (bullet) {
                 this.bullets.push(bullet);
+                this.bulletsFired++;
             }
         }
     }
@@ -196,6 +220,7 @@ class Game {
                     
                     // Add score
                     this.score += asteroid.size === 'large' ? 20 : asteroid.size === 'medium' ? 50 : 100;
+                    this.asteroidsDestroyed++;
                     this.updateUI();
                     
                     // Create explosion particles
@@ -296,6 +321,7 @@ class Game {
     
     gameOver() {
         this.state = 'gameOver';
+        this.timePlayed = Math.floor((Date.now() - this.gameStartTime) / 1000);
         document.getElementById('final-score').textContent = this.score;
         document.getElementById('game-over-section').style.display = 'flex';
         document.getElementById('player-name').focus();
@@ -309,7 +335,8 @@ class Game {
         }
         
         try {
-            const response = await fetch('/api/scores', {
+            // Submit score
+            const scoreResponse = await fetch('/api/scores', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -320,12 +347,36 @@ class Game {
                 })
             });
             
-            if (response.ok) {
+            // Submit player statistics
+            const statsResponse = await fetch('/api/playerStats', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    playerName,
+                    bulletsFired: this.bulletsFired,
+                    asteroidsDestroyed: this.asteroidsDestroyed,
+                    levelReached: this.level,
+                    timePlayed: this.timePlayed
+                })
+            });
+            
+            if (scoreResponse.ok && statsResponse.ok) {
+                // Store the current player's stats locally
+                this.lastGameStats = {
+                    playerName,
+                    bulletsFired: this.bulletsFired,
+                    asteroidsDestroyed: this.asteroidsDestroyed,
+                    levelReached: this.level,
+                    timePlayed: this.timePlayed,
+                    timestamp: new Date().toISOString()
+                };
                 this.loadScoreboard();
                 this.backToMenu();
             }
         } catch (error) {
-            console.error('Error submitting score:', error);
+            console.error('Error submitting score and statistics:', error);
         }
     }
     
@@ -373,13 +424,71 @@ class Game {
         }
     }
     
+    loadPlayerStats() {
+        const statsContainer = document.getElementById('player-stats');
+        
+        if (!this.lastGameStats) {
+            statsContainer.innerHTML = '<div class="loading">No game statistics available yet. Play a game first!</div>';
+            return;
+        }
+        
+        const stat = this.lastGameStats;
+        statsContainer.innerHTML = `
+            <div class="stats-entry">
+                <div class="stats-header">
+                    <span class="stats-name">${stat.playerName}</span>
+                    <span class="stats-date">${new Date(stat.timestamp).toLocaleDateString()}</span>
+                </div>
+                <div class="stats-details">
+                    <div class="stat-item">
+                        <span class="stat-label">Bullets Fired:</span>
+                        <span class="stat-value">${stat.bulletsFired}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Asteroids Destroyed:</span>
+                        <span class="stat-value">${stat.asteroidsDestroyed}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Level Reached:</span>
+                        <span class="stat-value">${stat.levelReached}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Time Played:</span>
+                        <span class="stat-value">${Math.floor(stat.timePlayed / 60)}:${(stat.timePlayed % 60).toString().padStart(2, '0')}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy:</span>
+                        <span class="stat-value">${stat.asteroidsDestroyed > 0 ? Math.round((stat.asteroidsDestroyed / stat.bulletsFired) * 100) : 0}%</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    showPlayerStats() {
+        document.getElementById('scoreboard-section').style.display = 'none';
+        document.getElementById('player-stats-section').style.display = 'block';
+        this.loadPlayerStats();
+    }
+    
     backToMenu() {
         this.state = 'menu';
         document.getElementById('scoreboard-section').style.display = 'block';
         document.getElementById('game-section').style.display = 'none';
         document.getElementById('game-over-section').style.display = 'none';
+        document.getElementById('player-stats-section').style.display = 'none';
         document.getElementById('pause-overlay').style.display = 'none';
         document.getElementById('player-name').value = '';
+        this.updateStatsButtonState();
+    }
+    
+    updateStatsButtonState() {
+        const statsButton = document.getElementById('player-stats-button');
+        if (this.lastGameStats) {
+            statsButton.classList.remove('disabled');
+        } else {
+            statsButton.classList.add('disabled');
+        }
     }
 }
 

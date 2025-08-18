@@ -25,6 +25,8 @@
                 </div>
                 <button class="start-button" id="start-button">Start Game</button>
                 <button class="clear-button" id="clear-button">Clear Scores</button>
+                <br>
+                <a href="#" class="player-stats-link" id="player-stats-button">View Game Stats</a>
             </div>
 
             <div class="game-section" id="game-section" style="display: none;">
@@ -61,6 +63,14 @@
                     </div>
                     <button id="play-again">Play Again</button>
                 </div>
+            </div>
+
+            <div class="player-stats-section" id="player-stats-section" style="display: none;">
+                <h2>Your Last Game Statistics</h2>
+                <div class="player-stats" id="player-stats">
+                    <div class="loading">Loading player statistics...</div>
+                </div>
+                <button class="back-button" onclick="game.backToMenu()">Back to Menu</button>
             </div>
         </div>
 
