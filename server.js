@@ -68,7 +68,19 @@ app.post('/api/playerStats', (req, res) => {
       typeof levelReached !== 'number' || typeof timePlayed !== 'number' || typeof score !== 'number') {
     return res.status(400).json({ error: 'Invalid player statistics data' });
   }
-  
+
+  let accuracy = null;
+
+  // Make sure we don't divide by zero
+  try {
+    if (bulletsfired === 0) {
+      throw new Error("Cannot divide by zero!"); // Throws a new Error object
+    }
+    accuracy = Math.max(0, Math.floor(asteroidsDestroyed / bulletsfired * 100));
+  } catch (error) {
+    console.error('Error calculating accuracy:', error);
+  }
+
   // Add new player statistics with timestamp
   const newStats = {
     id: Date.now() + Math.random(),
@@ -78,7 +90,7 @@ app.post('/api/playerStats', (req, res) => {
     levelReached: Math.max(1, Math.floor(levelReached)),
     timePlayed: Math.max(0, Math.floor(timePlayed)), // in seconds
     score: Math.max(0, Math.floor(score)), // Ensure positive integer
-    accuracy: Math.max(0, Math.floor(asteroidsDestroyed / bulletsfired * 100)),
+    accuracy: accuracy,
     timestamp: new Date().toISOString()
   };
   
