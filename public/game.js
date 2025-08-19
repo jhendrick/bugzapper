@@ -468,7 +468,7 @@ class Game {
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Accuracy:</span>
-                        <span class="stat-value">${stat.accuracy}</span>
+                        <span class="stat-value">${stat.asteroidsDestroyed > 0 ? Math.round((stat.asteroidsDestroyed / stat.bulletsFired) * 100) : 0}%</span>
                     </div>
                 </div>
             </div>
