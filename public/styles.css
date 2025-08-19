@@ -450,6 +450,58 @@ body {
     box-shadow: 0 6px 20px rgba(78, 205, 196, 0.6);
 }
 
+.view-past-stats-button {
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    margin-left: 15px;
+}
+
+.view-past-stats-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
+.past-stats-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4ecdc4;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+}
+
+.stats-entry.most-recent {
+    border: 2px solid #4ecdc4;
+    background: rgba(78, 205, 196, 0.1);
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+}
+
+.most-recent-badge {
+    background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.player-stats {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .game-container {

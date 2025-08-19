@@ -99,6 +99,10 @@ class Game {
             }
         });
         
+        document.getElementById('view-past-stats-button').addEventListener('click', () => {
+            this.showPastGameStats();
+        });
+        
         // Enter key for name input
         document.getElementById('player-name').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -358,7 +362,8 @@ class Game {
                     bulletsFired: this.bulletsFired,
                     asteroidsDestroyed: this.asteroidsDestroyed,
                     levelReached: this.level,
-                    timePlayed: this.timePlayed
+                    timePlayed: this.timePlayed,
+                    score: this.score
                 })
             });
             
@@ -370,6 +375,7 @@ class Game {
                     asteroidsDestroyed: this.asteroidsDestroyed,
                     levelReached: this.level,
                     timePlayed: this.timePlayed,
+                    score: this.score,
                     timestamp: new Date().toISOString()
                 };
                 this.loadScoreboard();
@@ -441,6 +447,10 @@ class Game {
                 </div>
                 <div class="stats-details">
                     <div class="stat-item">
+                        <span class="stat-label">Score:</span>
+                        <span class="stat-value">${stat.score || 0}</span>
+                    </div>
+                    <div class="stat-item">
                         <span class="stat-label">Bullets Fired:</span>
                         <span class="stat-value">${stat.bulletsFired}</span>
                     </div>
@@ -454,11 +464,11 @@ class Game {
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Time Played:</span>
-                        <span class="stat-value">${Math.floor(stat.timePlayed / 60)}:${(stat.timePlayed % 60).toString().padStart(2, '0')}</span>
+                        <span class="stat-value">${stat.timePlayed}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">Accuracy:</span>
-                        <span class="stat-value">${stat.asteroidsDestroyed > 0 ? Math.round((stat.asteroidsDestroyed / stat.bulletsFired) * 100) : 0}%</span>
+                        <span class="stat-value">${stat.accuracy}</span>
                     </div>
                 </div>
             </div>
@@ -469,6 +479,80 @@ class Game {
         document.getElementById('scoreboard-section').style.display = 'none';
         document.getElementById('player-stats-section').style.display = 'block';
         this.loadPlayerStats();
+    }
+    
+    async showPastGameStats() {
+        document.getElementById('scoreboard-section').style.display = 'none';
+        document.getElementById('player-stats-section').style.display = 'block';
+        await this.loadPastGameStats();
+    }
+    
+    async loadPastGameStats() {
+        const statsContainer = document.getElementById('player-stats');
+        statsContainer.innerHTML = '<div class="loading">Loading past game statistics...</div>';
+        
+        try {
+            const response = await fetch('/api/playerStats');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const stats = await response.json();
+            
+            if (!stats || stats.length === 0) {
+                statsContainer.innerHTML = '<div class="loading">No past game statistics available yet. Play some games first!</div>';
+                return;
+            }
+            
+            let statsHTML = '<div class="past-stats-title">Past 10 Game Statistics</div>';
+            
+            stats.forEach((stat, index) => {
+                //const accuracy = stat.bulletsFired > 0 ? Math.round((stat.asteroidsDestroyed / stat.bulletsFired) * 100) : 0;
+                const timeFormatted = `${Math.floor(stat.timePlayed / 60)}:${(stat.timePlayed % 60).toString().padStart(2, '0')}`;
+                
+                statsHTML += `
+                    <div class="stats-entry ${index === 0 ? 'most-recent' : ''}">
+                        <div class="stats-header">
+                            <span class="stats-name">${stat.playerName}</span>
+                            <span class="stats-date">${new Date(stat.timestamp).toLocaleDateString()}</span>
+                            ${index === 0 ? '<span class="most-recent-badge">Most Recent</span>' : ''}
+                        </div>
+                        <div class="stats-details">
+                            <div class="stat-item">
+                                <span class="stat-label">Score:</span>
+                                <span class="stat-value">${stat.score || 0}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Bullets Fired:</span>
+                                <span class="stat-value">${stat.bulletsFired}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Asteroids Destroyed:</span>
+                                <span class="stat-value">${stat.asteroidsDestroyed}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Level Reached:</span>
+                                <span class="stat-value">${stat.levelReached}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Time Played:</span>
+                                <span class="stat-value">${timeFormatted}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Accuracy:</span>
+                                <span class="stat-value">${stat.accuracy}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            statsContainer.innerHTML = statsHTML;
+            
+        } catch (error) {
+            console.error('Error loading past game stats:', error);
+            statsContainer.innerHTML = '<div class="loading">Error loading past game statistics. Please try again.</div>';
+        }
     }
     
     backToMenu() {

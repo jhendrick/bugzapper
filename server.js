@@ -9,6 +9,9 @@ let scores = [];
 // In-memory storage for player statistics
 let playerStats = [];
 
+// Starting number of bullets fired
+let bulletsfired = 0;
+
 // Middleware
 app.use(express.json());
 app.use(express.static('public'));
@@ -59,10 +62,10 @@ app.get('/api/clearScores', (req, res) => {
 
 // Add player statistics
 app.post('/api/playerStats', (req, res) => {
-  const { playerName, bulletsFired, asteroidsDestroyed, levelReached, timePlayed } = req.body;
+  const { playerName, bulletsFired, asteroidsDestroyed, levelReached, timePlayed, score } = req.body;
   
   if (!playerName || typeof bulletsFired !== 'number' || typeof asteroidsDestroyed !== 'number' || 
-      typeof levelReached !== 'number' || typeof timePlayed !== 'number') {
+      typeof levelReached !== 'number' || typeof timePlayed !== 'number' || typeof score !== 'number') {
     return res.status(400).json({ error: 'Invalid player statistics data' });
   }
   
@@ -74,7 +77,8 @@ app.post('/api/playerStats', (req, res) => {
     asteroidsDestroyed: Math.max(0, Math.floor(asteroidsDestroyed)),
     levelReached: Math.max(1, Math.floor(levelReached)),
     timePlayed: Math.max(0, Math.floor(timePlayed)), // in seconds
-    accuracy: Math.max(0, Math.floor(asteroidsDestroyed / bulletsFired * 100)),
+    score: Math.max(0, Math.floor(score)), // Ensure positive integer
+    accuracy: Math.max(0, Math.floor(asteroidsDestroyed / bulletsfired * 100)),
     timestamp: new Date().toISOString()
   };
   
