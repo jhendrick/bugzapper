@@ -19,5 +19,9 @@ EXPOSE 3000
 # Define environment variable
 ENV NODE_ENV=production
 
+# Dynatrace ENV vars for Live Debugger
+ENV DT_LIVEDEBUGGER_REMOTE_ORIGIN=https://github.com/joshDynatrace/bug-busters
+ENV DT_LIVEDEBUGGER_COMMIT=main
+
 # Command to run the application
 CMD ["npm", "start"] 
